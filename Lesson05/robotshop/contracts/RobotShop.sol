@@ -49,8 +49,27 @@ contract RobotShop {
     uint[] memory forSale = new uint[](numberOfRobotsForSale);
     for(uint j = 0; j < numberOfRobotsForSale; j++) {
       forSale[j] = robotIds[j];
-}
+    }
     //返回最终的列表
     return forSale;
   }
+  function buyRobot(uint _id) payable public {
+    // 检查是否有待出售的机器人时，看robotCounter是否大于0
+    require(robotCounter > 0);
+    // 检查传入的id是否合法，是否存在这个机器人
+    require(_id > 0 && _id <= robotCounter);
+    // 根据id获取机器人内容
+    Robot storage robot = robots[_id];
+    // 检查机器人是否已被卖出
+    require(robot.buyer == 0X0);
+    // 不允许购买自己出售的机器人
+    require(msg.sender != robot.seller);
+    // 购买价格必须等于机器人价格
+    require(msg.value == robot.price);
+    // 保存买家的账户地址
+    robot.buyer = msg.sender;
+    // 把钱从买家账户转移给卖家账户
+    robot.seller.transfer(msg.value);
+  }
+}
 }
