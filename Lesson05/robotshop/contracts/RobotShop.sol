@@ -58,7 +58,7 @@ contract RobotShop {
     require(robotCounter > 0);
     // 检查传入的id是否合法，是否存在这个机器人
     require(_id > 0 && _id <= robotCounter);
-    // 根据id获取机器人内容
+    // 根据id获取机器人信息
     Robot storage robot = robots[_id];
     // 检查机器人是否已被卖出
     require(robot.buyer == 0X0);
@@ -66,9 +66,9 @@ contract RobotShop {
     require(msg.sender != robot.seller);
     // 购买价格必须等于机器人价格
     require(msg.value == robot.price);
-    // 保存买家的账户地址
+    // 校验通过，保存买家的账户地址，代表购买了该机器人
     robot.buyer = msg.sender;
-    // 把钱从买家账户转移给卖家账户
+    // 把钱转账给卖家账户
     robot.seller.transfer(msg.value);
   }
 }
