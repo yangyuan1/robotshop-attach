@@ -1,6 +1,6 @@
 pragma solidity ^0.4.21;
-// contract关键字用于声明一个智能合约，这里智能合约的名称要和文件名相同
-contract RobotShop {
+import "./Ownable.sol"; //引用智能合约文件
+contract RobotShop is Ownable{
   // 声明一个存储机器人的结构体，里面包含一个机器人所有的属性字段
   struct Robot {
     uint id; //唯一id，对应一个唯一的机器人
@@ -14,6 +14,27 @@ contract RobotShop {
   mapping (uint => Robot) public robots;
   //记录机器人智能合约中机器人列表的总数下标
   uint robotCounter;
+  //增加一个销毁函数，使用函数修改器，只能让合约所有者调用
+  function kill() public onlyOwner{
+    selfdestruct(owner);
+  }
+  //增加一个卖出机器人事件
+  event LogSellRobot(
+    // 增加一个参数
+    uint indexed _id,
+    address indexed _seller,
+    string _name,
+    uint256 _price
+  );
+  //增加一个购买机器人事件
+  event LogBuyRobot(
+    // 增加一个参数
+    uint indexed _id,
+    address indexed _seller,
+    address indexed _buyer,
+    string _name,
+    uint256 _price
+  );
   //声明一个函数，在区块链上建立一笔出售机器人的记录
   function sellRobot(string _name, string _description, uint256 _price) public {
     robotCounter++; //首先对总数加一
@@ -26,6 +47,8 @@ contract RobotShop {
       _description,
       _price
     );
+    // 触发事件
+    emit LogSellRobot(robotCounter,msg.sender, _name, _price);
   }
   //创建一个函数，获取所有机器人的总数
   function getNumberOfRobots() public view returns (uint) {
@@ -70,5 +93,7 @@ contract RobotShop {
     robot.buyer = msg.sender;
     // 把钱转账给卖家账户
     robot.seller.transfer(msg.value);
+    // 触发事件
+    emit LogBuyRobot(_id, robot.seller, robot.buyer, robot.name, robot.price);
   }
 }
