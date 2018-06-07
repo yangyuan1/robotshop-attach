@@ -72,4 +72,3 @@ contract RobotShop {
     robot.seller.transfer(msg.value);
   }
 }
-}
