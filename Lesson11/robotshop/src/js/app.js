@@ -42,6 +42,7 @@
     $.getJSON('RobotShop.json', function(robotShopArtifact) {
         App.contracts.RobotShop = TruffleContract(robotShopArtifact);
         App.contracts.RobotShop.setProvider(App.web3Provider);
+	App.listenToEvents();
         return App.reloadRobots();
       });
   },
